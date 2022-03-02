@@ -1,0 +1,26 @@
+name: SetupService_CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-server:
+    runs-on: ubuntu-latest
+    env:
+      sha: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v2
+        name: checkout repository
+        with:
+          name: JackFay/mode-server
+          ref: master
+
+      - name: Deploy Repo
+        run: |-
+          echo "${{ secrets.SERVER_SSH_KEY }}" > key.pem
+          chmod 400 key.pem
+          ls
+          scp -o StrictHostKeyChecking=no -i key.pem ./devops-task/src/index.php ./devops-task/src/version.env ec2-user@3.17.157.132:/home/ec2-user/php_app
+
