@@ -20,7 +20,30 @@ Please **update** this **README** file as part of the solution to **document the
 
 ### Part 1 Solution Below ###
 
-TODO: Provide DETAIL steps on how to run your provisioning code
+1. Create Security Group
+aws ec2 create-security-group --group-name mode-interview --description "Basic security group" # copy groupId from output = sg-0ccb1d0520df53dc6
+
+2. Edit security group to allow incoming connections on port 22 and 443
+aws ec2 authorize-security-group-ingress --group-name mode-interview --protocol tcp --port 22 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-name mode-interview --protocol tcp --port 443 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-name mode-interview --protocol tcp --port 80 --cidr 0.0.0.0/0
+
+3. Create a key-pair to access the instance
+aws ec2 create-key-pair --key-name mode-interview-key --query 'KeyMaterial' --output text > mode-interview-key.pem
+
+
+4. Run an instance in the secruity group
+aws ec2 run-instances --image-id ami-0661cd3308ec33aaa --security-group-ids sg-0ccb1d0520df53dc6 --instance-type t2.micro --key-name mode-interview-key
+
+
+5. SSH Into the instance and install Docker (This could be automated for future servers, just doing it manually now for simplicity)
+
+    - ssh -i "key file.pem" ec2-user@ip-address
+    - sudo yum update -y && sudo amazon-linux-extras install docker && sudo yum install docker
+
+
+6. Start docker php server
+    sudo docker run -d -p 80:80 --name server -v ~/php_app:/var/www/html php:7.2-apache
 
 ### Part 1 Solution Above ###
 
@@ -43,7 +66,10 @@ your own working pipeline.
 
 ### Part 2 Solution Below ###
 
-TODO: Provide CI/CD Pipeline
+Visit this url to view the running app: http://3.17.157.132 
+
+Here is the working pipeline as a GitHub Action:
+https://github.com/JackFay/mode-server/actions
 
 ### Part 2 Solution Above ###
 
